@@ -1,0 +1,51 @@
+services:
+  traefik:
+    image: traefik:v3.0
+    container_name: traefik_container
+    hostname: traefik_host
+    networks:
+      - traefik-net
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./acme.json:/acme.json
+    restart: always
+    command:
+      # 1. Основные настройки: слушаем Docker и выключаем авто-экспорт
+      - '--providers.docker=true'
+      - '--providers.docker.exposedbydefault=false'
+      - '--providers.docker.network=traefik-net'
+
+      # 2. Дашборд: включаем только внутренний интерфейс
+      - '--api.dashboard=true'
+
+      # 3. Порты: создаем точки входа для 80 и 443
+      - '--entrypoints.web.address=:80'
+      - '--entrypoints.websecure.address=:443'
+
+      # 4. Авто-редирект: всегда перекидываем с http на https
+      - '--entrypoints.web.http.redirections.entryPoint.to=websecure'
+      - '--entrypoints.web.http.redirections.entryPoint.scheme=https'
+
+      # 5. SSL (Let's Encrypt): настройки резолвера
+      - '--certificatesresolvers.myresolver.acme.tlschallenge=true'
+      - '--certificatesresolvers.myresolver.acme.email=i727i@mail.ru'
+      - '--certificatesresolvers.myresolver.acme.storage=/acme.json'
+
+    labels:
+      - 'traefik.enable=true'
+      # Настройка доступа к дашборду по домену
+      - 'traefik.http.routers.api.rule=Host(`traefik.prank-sound.ru`)'
+      - 'traefik.http.routers.api.service=api@internal'
+      - 'traefik.http.routers.api.entrypoints=websecure'
+      - 'traefik.http.routers.api.tls.certresolver=myresolver'
+      # Защита дашборда паролем (Basic Auth)
+      - 'traefik.http.routers.api.middlewares=auth'
+      # Сгенерируйте свой хеш (логин admin, пароль password):
+      - 'traefik.http.middlewares.auth.basicauth.users=admin:$$2y$$05$$6nzCT5uL3YHZPqX7e8adyOjxT1ZBPVqyglCPgGcjce2iq0h1LQLMa'
+
+networks:
+  traefik-net:
+    external: true # указывает на использование существующей сети, а не на создание новой
