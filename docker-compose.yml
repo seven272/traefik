@@ -20,7 +20,6 @@ services:
       - '--providers.docker=true' #Включает поддержку Docker как источника конфигурации.
       - '--providers.docker.exposedbydefault=false' #Запрещает автоматическую публикацию всех контейнеров.
       - '--providers.docker.network=traefik-net' # Указывает сеть Docker по умолчанию для взаимодействия.
-      #- '--providers.docker.version=1.44' #Для совместимости версий Докер на сервер и в Траефик
       # 2. Дашбоард
       # Включаем дашборд (БЕЗ insecure!)
       - '--api.dashboard=true'
