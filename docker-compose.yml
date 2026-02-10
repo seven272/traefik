@@ -45,3 +45,5 @@ services:
 networks:
   traefik-net:
     external: true
+    driver_opts:
+      com.docker.network.driver.mtu: "1400" # Чтобы Docker всегда помнил про MTU
