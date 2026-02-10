@@ -2,7 +2,7 @@ services:
   traefik:
     image: traefik:v3.0
     container_name: traefik_container
-    hostname: traefik_host
+    user: root
     networks:
       - traefik-net
     ports:
@@ -18,6 +18,8 @@ services:
     command:
       # 1. Docker провайдер
       - '--providers.docker=true' #Включает поддержку Docker как источника конфигурации.
+      # Форсируем версию API прямо в адресе сокета:
+      - "--providers.docker.endpoint=unix:///var/run/docker.sock?apiVersion=1.44"
       - '--providers.docker.exposedbydefault=false' #Запрещает автоматическую публикацию всех контейнеров.
       - '--providers.docker.network=traefik-net' # Указывает сеть Docker по умолчанию для взаимодействия.
       # 2. Дашбоард
