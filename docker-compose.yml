@@ -1,8 +1,8 @@
 services:
   traefik:
-    image: traefik:v3.0
+    image: traefik:v2.11
     container_name: traefik_container
-    # 1. Запуск от root убирает проблемы с доступом к сокету
+    # От root запускать больше не обязательно, но можно оставить для надежности
     user: root 
     networks:
       - traefik-net
@@ -14,14 +14,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./acme.json:/acme.json
     restart: always
-    
-    # 2. Форсируем версию API через переменные окружения
-    environment:
-      - DOCKER_API_VERSION=1.44
-      - DOCKER_HOST=unix:///var/run/docker.sock
-
     command:
-      # 3. Чистый блок без лишних параметров в endpoint
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
       - "--providers.docker.network=traefik-net"
@@ -31,6 +24,8 @@ services:
       
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
+      
+      # Редирект в v2 чуть-чуть другой по синтаксису (через entryPoint)
       - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
       - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
       
