@@ -31,6 +31,9 @@ services:
       - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
       - '--certificatesresolvers.myresolver.acme.email=i727i@mail.ru'
       - '--certificatesresolvers.myresolver.acme.storage=/acme.json'
+      # 5. Логи
+      - "--accesslog=true"
+      - "--accesslog.filepath=/var/log/traefik/access.log"
 
     labels:
       - 'traefik.enable=true'
