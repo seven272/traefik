@@ -33,7 +33,6 @@ services:
       - '--certificatesresolvers.myresolver.acme.storage=/acme.json'
       # 5. Логи
       - "--accesslog=true"
-      - "--accesslog.filepath=/var/log/traefik/access.log"
 
     labels:
       - 'traefik.enable=true'
